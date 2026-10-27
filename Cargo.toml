@@ -1,0 +1,14 @@
+[package]
+name = "learn-vulkano"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+vulkano = "0.35.2"
+vulkano-shaders = "0.35"
+vulkano-win = "0.34"
+vulkane = "0.16.0"
+vulkano-macros = "0.35.0"
+
+[profile.dev]
+opt-level = 1
