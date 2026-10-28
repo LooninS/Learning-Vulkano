@@ -1,11 +1,10 @@
 use std::default::Default;
 use std::sync::Arc;
-use vulkane::safe::AllocationUsage;
 use vulkano::{
     VulkanLibrary,
-    buffer::{Buffer, BufferCreateInfo, BufferUsage},
-    device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo, QueueFlags, physical},
-    instance::{Instance, InstanceCreateFlags, InstanceCreateInfo, InstanceExtensions},
+    buffer::{Buffer, BufferContents, BufferCreateInfo, BufferUsage},
+    device::{Device, DeviceCreateInfo, QueueCreateInfo, QueueFlags},
+    instance::{Instance, InstanceCreateFlags, InstanceCreateInfo},
     memory::allocator::{AllocationCreateInfo, MemoryTypeFilter, StandardMemoryAllocator},
 };
 
@@ -52,20 +51,21 @@ fn main() {
 
     let memory_allocator = Arc::new(StandardMemoryAllocator::new_default(device.clone()));
 
-    let data: i32 = 12;
-
-    let buffer = Buffer::from_data(
-        memory_allocator,
+    let iter = (0..128).map(|_| 5u8);
+    let buffer = Buffer::from_iter(
+        memory_allocator.clone(),
         BufferCreateInfo {
             usage: BufferUsage::UNIFORM_BUFFER,
             ..Default::default()
         },
         AllocationCreateInfo {
-            memory_type_filter: MemoryTypeFilter::PREFER_DEVICE
-                | MemoryTypeFilter::HOST_SEQUENTIAL_WRITE,
+            memory_type_filter: MemoryTypeFilter::PREFER_DEVICE,
             ..Default::default()
         },
-        data,
+        iter,
     )
-    .expect("failed to create buffer");
+    .unwrap();
+    let mut content = buffer.write().unwrap();
+    content[12] = 42;
+    content[7] = 99;
 }
